@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <base target="_top">
+  <script src="./config.js"></script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script src="./drive.js" defer></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pastoral Mind · 목회자 제2의 두뇌</title>
+  <style>
+    :root { --ink:#1D2D2B; --ink-soft:#475B56; --muted:#73837D; --accent:#226E58; --accent-dark:#145541; --light:#E9F2EC; --cream:#F7F8F4; --paper:#FFFFFF; --line:#DFE7E1; --gold:#DFAE67; --shadow:0 10px 34px rgba(23,54,42,.07); }
+    * { box-sizing:border-box; }
+    body { margin:0; color:var(--ink); background:var(--cream); font-family:Pretendard,"Apple SD Gothic Neo","Malgun Gothic",system-ui,-apple-system,sans-serif; font-size:15px; line-height:1.65; }
+    button, textarea, input { font:inherit; }
+    button { cursor:pointer; }
+    .shell { max-width:1330px; margin:auto; min-height:100vh; display:grid; grid-template-columns:300px minmax(0,1fr); }
+    aside { background:#203F35; color:#fff; padding:36px 24px 26px; display:flex; flex-direction:column; gap:0; }
+    .logo { display:flex; align-items:center; gap:12px; letter-spacing:.02em; }
+    .logo-symbol { width:37px; height:37px; border:1px solid rgba(255,255,255,.34); border-radius:12px; display:grid; place-items:center; font-size:20px; color:#F6D6A5; }
+    .brand-title { font-size:19px; font-weight:800; letter-spacing:-.035em; }
+    .brand-caption { color:#ACC3B6; font-size:11px; line-height:1.2; }
+    .side-intro { padding:42px 3px 28px; border-bottom:1px solid rgba(255,255,255,.13); }
+    .eyebrow { text-transform:uppercase; letter-spacing:.18em; font-weight:750; font-size:11px; }
+    .side-intro .eyebrow { color:#D1AF78; }
+    .side-intro h2 { margin:12px 0 10px; font-family:Georgia,"Noto Serif KR",serif; font-weight:550; font-size:26px; letter-spacing:-.06em; line-height:1.4; }
+    .side-intro p { margin:0; font-size:13px; color:#C7D9D0; line-height:1.8; }
+    .side-nav-title { font-size:11px; letter-spacing:.12em; color:#A6BFB1; margin:29px 11px 14px; font-weight:750; }
+    .side-nav { display:grid; gap:5px; }
+    .nav-item { border:0; background:transparent; text-align:left; color:#D7E4DC; width:100%; padding:12px 10px; border-radius:11px; display:flex; gap:12px; align-items:center; transition:.15s ease; }
+    .nav-item:hover { background:rgba(255,255,255,.09); }
+    .nav-item.active { background:#EAF3EC; color:#1B4D3E; font-weight:750; }
+    .nav-num { width:22px; font-size:12px; font-weight:700; color:#BDD2C4; }
+    .nav-item.active .nav-num { color:#2F8067; }
+    .nav-name { flex:1; font-size:13px; }
+    .nav-dot { width:7px; height:7px; background:#84C6A9; border-radius:100%; }
+    .side-foot { margin-top:auto; border-top:1px solid rgba(255,255,255,.13); padding-top:23px; color:#B9D0C2; font-size:12px; line-height:1.7; }
+    .side-foot a { color:#E8DBC0; }
+    main { padding:32px clamp(22px,5vw,76px) 60px; min-width:0; }
+    .topline { display:flex; align-items:center; justify-content:space-between; gap:15px; margin-bottom:45px; }
+    .status-pill { display:inline-flex; align-items:center; gap:8px; border:1px solid var(--line); color:var(--accent-dark); background:#fff; padding:7px 12px; border-radius:30px; font-size:12px; font-weight:700; }
+    .status-pill::before { content:""; width:7px; height:7px; border-radius:50%; background:#59AA80; }
+    .toplink { color:var(--muted); font-size:12px; text-decoration:none; }
+    .hero { max-width:740px; }
+    .hero .eyebrow { color:#9E7C4D; }
+    .hero h1 { font-weight:760; font-size:clamp(30px,3.6vw,48px); line-height:1.31; letter-spacing:-.065em; margin:12px 0 13px; }
+    .hero h1 em { color:var(--accent); font-style:normal; }
+    .hero p { color:var(--ink-soft); font-size:15px; margin:0; line-height:1.9; }
+    .progress-wrap { margin:34px 0 27px; padding:22px 26px; background:#fff; border:1px solid var(--line); border-radius:18px; box-shadow:var(--shadow); }
+    .progress-head { display:flex; justify-content:space-between; margin-bottom:13px; gap:15px; align-items:center; }
+    .progress-head strong { font-size:13px; }
+    .progress-head span { color:var(--muted); font-size:12px; font-weight:700; }
+    .progress-line { height:7px; background:#E9EEE9; border-radius:10px; overflow:hidden; }
+    .progress-fill { background:linear-gradient(90deg,#77B99A,#1F7058); height:100%; width:0%; border-radius:10px; transition:width .22s ease; }
+    .section-header { margin:39px 0 22px; }
+    .section-header .eyebrow { color:var(--accent); }
+    .section-header h2 { font-size:27px; margin:5px 0 3px; letter-spacing:-.055em; }
+    .section-header p { margin:0; color:var(--muted); font-size:14px; }
+    .identity-card, .question-card, .finish-card { background:var(--paper); border:1px solid var(--line); border-radius:18px; box-shadow:var(--shadow); padding:28px 30px; }
+    .identity-card { margin-bottom:17px; }
+    .identity-card h3 { font-size:17px; letter-spacing:-.03em; margin:0 0 5px; }
+    .identity-card>p { margin:0 0 17px; color:var(--muted); font-size:13px; }
+    .inputs { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+    .input-block label { display:block; color:var(--ink-soft); font-weight:650; font-size:12px; margin-bottom:7px; }
+    .input-block input { width:100%; border:1px solid #D7E1DA; border-radius:9px; background:#FCFDFB; outline:none; padding:11px 12px; font-size:13px; }
+    .input-block input:focus, textarea:focus { border-color:#60A988; box-shadow:0 0 0 3px #DAEDE1; }
+    .question-card { margin-bottom:15px; }
+    .question-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:13px; }
+    .number { color:var(--accent); font-size:12px; font-weight:850; letter-spacing:.03em; }
+    .question-kind { background:#F1F5F0; color:#698174; font-size:11px; padding:3px 10px; border-radius:99px; font-weight:700; }
+    .question-card h3 { font-size:17px; line-height:1.63; letter-spacing:-.035em; margin:0 0 9px; }
+    .helper { margin:0 0 18px; color:#65786E; font-size:13px; line-height:1.75; padding-left:13px; border-left:2px solid #D8B47B; }
+    textarea { width:100%; resize:vertical; min-height:153px; border:1px solid #DEE6DF; border-radius:11px; background:#FCFDFB; padding:16px 17px; color:var(--ink); font-size:14px; line-height:1.8; outline:none; }
+    textarea::placeholder { color:#ABB7AF; }
+    .question-foot { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-top:7px; font-size:11px; color:var(--muted); }
+    .action-bar { display:flex; flex-wrap:wrap; gap:10px; margin:26px 0 19px; }
+    .btn { border:1px solid var(--line); background:white; border-radius:10px; min-height:44px; padding:11px 16px; font-weight:750; font-size:13px; color:var(--ink); display:inline-flex; align-items:center; gap:7px; justify-content:center; }
+    .btn:disabled { opacity:.45; cursor:not-allowed; }
+    .btn:hover:not(:disabled) { border-color:#A4C1B0; }
+    .btn.primary { background:var(--accent); color:#fff; border-color:var(--accent); }
+    .btn.primary:hover:not(:disabled) { background:var(--accent-dark); }
+    .btn.ghost { background:transparent; border-color:transparent; color:var(--muted); }
+    .grow { flex:1; }
+    .save-card { background:#EFF4ED; border:1px solid #DDEBDF; border-radius:16px; padding:21px 23px; margin-top:31px; }
+    .save-card h3 { margin:0 0 6px; font-size:15px; letter-spacing:-.02em; }
+    .save-card p { margin:0 0 13px; color:#617569; font-size:12px; line-height:1.8; }
+    .consent { display:flex; align-items:flex-start; gap:10px; font-size:12px; font-weight:650; color:#3F5E50; cursor:pointer; }
+    .consent input { margin-top:4px; accent-color:var(--accent); }
+    .save-actions { display:flex; flex-wrap:wrap; gap:9px; margin-top:15px; }
+    .message { margin:12px 0 0; color:#5A725F; font-size:12px; line-height:1.7; min-height:18px; }
+    .message.error { color:#B04B4B; }
+    .message a { color:var(--accent-dark); font-weight:700; }
+    .finish-card { margin-top:26px; }
+    .finish-card h3 { margin:0 0 7px; font-size:16px; }
+    .complete-row { display:flex; flex-wrap:wrap; align-items:center; gap:12px; margin-top:17px; }
+    .complete-row .btn { min-width:164px; }
+    .complete-status { color:#567568; font-size:12px; }
+    .complete-status.done { color:#176343; font-weight:750; }
+    .complete-status small { display:block; font-weight:400; line-height:1.6; }
+    .finish-card p { color:var(--muted); margin:0; font-size:13px; }
+    .finish-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:7px; margin-top:16px; }
+    .finish-chip { border:1px solid var(--line); border-radius:8px; padding:8px; font-size:11px; color:var(--muted); background:white; }
+    .finish-chip.done { background:#EDF6EF; color:#226E58; border-color:#D4E8D8; }
+    .footer { margin-top:30px; font-size:11px; color:#8A9A90; line-height:1.8; }
+    @media(max-width:980px) { .shell { grid-template-columns:250px minmax(0,1fr); } aside { padding:28px 17px; } main { padding:30px 26px 50px; } .inputs { grid-template-columns:1fr 1fr; } }
+    @media(max-width:680px) { .shell { display:block; } aside { padding:18px 19px 14px; } .side-intro, .side-nav-title, .side-foot { display:none; } .side-nav { display:flex; margin-top:15px; overflow-x:auto; padding-bottom:5px; } .nav-item { flex-shrink:0; width:auto; white-space:nowrap; background:rgba(255,255,255,.08); padding:7px 10px; border-radius:7px; } .nav-num { display:none; } .nav-name { font-size:12px; } .nav-dot { display:none; } .logo-symbol { width:31px; height:31px; } .brand-title { font-size:15px; } main { padding:25px 16px 45px; } .topline { margin-bottom:30px; } .hero h1 { font-size:31px; } .progress-wrap { padding:18px; margin:24px 0; } .section-header { margin-top:27px; } .question-card,.identity-card,.finish-card { padding:20px 17px; } .question-card h3 { font-size:16px; } .inputs { grid-template-columns:1fr; } .action-bar .grow { flex-basis:100%; } .save-actions .btn { flex:1; } .finish-grid { grid-template-columns:1fr 1fr; } }
+  </style>
+</head>
+<body>
+<div class="shell">
+  <aside>
+    <div class="logo"><div class="logo-symbol">✦</div><div><div class="brand-title">Pastoral Mind</div><div class="brand-caption">THE SECOND MIND PROJECT</div></div></div>
+    <div class="side-intro"><div class="eyebrow">DEEP INTERVIEW</div><h2>목회자의 생각을<br>하나의 지도로.</h2><p>유형을 나누는 검사가 아니라, 당신만의 사고와 판단의 원칙을 기록하는 인터뷰입니다.</p></div>
+    <div class="side-nav-title">INTERVIEW CHAPTERS</div>
+    <nav class="side-nav" id="sideNav" aria-label="인터뷰 영역"></nav>
+    <div class="side-foot">모든 초안은 이 브라우저에 자동 저장됩니다.<br>구글 드라이브 저장은 웹 앱 배포 후 이용할 수 있습니다.<br><a href="https://drive.google.com/drive/my-drive" target="_blank" rel="noopener noreferrer">내 응답 폴더 ↗</a></div>
+  </aside>
+  <main>
+    <div class="topline"><span class="status-pill">개인 심층 인터뷰</span><a class="toplink" href="https://drive.google.com/drive/my-drive" target="_blank" rel="noopener noreferrer">내 구글 드라이브 ↗</a></div>
+    <header class="hero"><div class="eyebrow">REFLECTION · CONVICTION · PRACTICE</div><h1>나는 어떤 목회자이며,<br><em>어떻게 생각하는가?</em></h1><p>정답을 쓰지 않아도 됩니다. 실제 경험과 판단을 솔직하게 적어 주세요. 여기에 쌓인 응답이 나중에 당신만의 목회 사고 모델을 구성하는 기초 자료가 됩니다.</p></header>
+    <div class="progress-wrap" aria-label="설문 진행률"><div class="progress-head"><strong>나의 생각 지도</strong><span id="progressText">0 / 24 답변</span></div><div class="progress-line"><div class="progress-fill" id="progressFill"></div></div></div>
+    <div id="identityBlock" class="identity-card"><h3>인터뷰 기본 정보 <span style="font-size:11px;color:#809184;font-weight:500">· 모두 선택 입력</span></h3><p>실명 대신 별명을 사용해도 됩니다. 성도 이름이나 구체적인 상담 개인정보는 작성하지 마세요.</p><div class="inputs"><div class="input-block"><label for="displayName">이름 또는 별명</label><input id="displayName" maxlength="40" placeholder="예: 목회자 A" /></div><div class="input-block"><label for="ministry">현재 주요 사역</label><input id="ministry" maxlength="90" placeholder="예: 설교, 청년 사역" /></div><div class="input-block"><label for="career">목회 경력</label><input id="career" maxlength="60" placeholder="예: 4년차" /></div></div></div>
+    <div id="sectionTitle" class="section-header"></div>
+    <div id="questionList"></div>
+    <div class="action-bar"><button id="prevBtn" class="btn" type="button">← 이전 영역</button><span class="grow"></span><button id="nextBtn" class="btn primary" type="button">다음 영역 →</button></div>
+    <div class="save-card" id="saveCard"><h3>생각을 안전하게 보관하기</h3><p>구글 드라이브에 저장하면 응답이 <strong>내 드라이브의 Google 문서</strong>로 생성됩니다. GitHub Pages에서는 저장할 때마다 새 Google 문서가 생성됩니다. 내 PC에 Markdown 파일로도 백업할 수 있습니다.</p><label class="consent"><input type="checkbox" id="consent" /><span>내가 작성한 목회철학·종교적 견해 등의 내용을 내 Google 드라이브 응답 폴더에 저장하는 데 동의합니다.</span></label><div class="save-actions"><button id="driveSave" class="btn primary" type="button">☁ 구글 드라이브에 저장</button><button id="downloadBtn" class="btn" type="button">↓ 내 PC에 백업</button><button id="clearBtn" class="btn ghost" type="button">이 기기 초안 삭제</button></div><div class="message" id="saveMessage" role="status" aria-live="polite"></div></div>
+    <div class="finish-card" id="finishCard"><h3>이 인터뷰를 마친 후</h3><p>24개 문항을 모두 작성하면 <strong>작성 완료</strong> 버튼이 활성화됩니다. 완료 후에는 이 기기에 기록되고, Google Drive 인증이 설정되어 있고 동의했다면 응답 문서도 저장할 수 있습니다. 나중에 ChatGPT에 문서를 지정해 분석을 요청해 주세요.</p><div class="finish-grid" id="finishGrid"></div><div class="complete-row"><button id="completeBtn" class="btn primary" type="button" disabled>✓ 작성 완료</button><span class="complete-status" id="completeStatus" role="status" aria-live="polite">모든 질문에 답하면 완료할 수 있습니다.</span></div></div>
+    <div class="footer">Pastoral Mind v1.1 · 자체 제작 심층 탐색 도구로, 심리검사 또는 목회 역량에 대한 검증된 진단이 아닙니다. 브라우저 자동 저장은 현재 기기에만 보관됩니다. 공용 기기에서는 사용 후 초안을 삭제해 주세요.</div>
+  </main>
+</div>
+<script>
+'use strict';
+const SECTIONS = [
+  {title:'목회 정체성',subtitle:'나는 무엇을 위해 목회하는가',questions:[
+    {kind:'소명의 서사',q:'당신이 목회자의 길을 걷게 된 이유는 무엇이며, 그 이유는 지금 어떻게 달라졌습니까?',hint:'결정적인 사건이나 사람, 처음의 기대, 시간이 지나며 바뀐 생각을 구체적으로 적어 보세요.'},
+    {kind:'핵심 가치',q:'당신에게 ‘좋은 목회’의 기준은 무엇입니까? 그 기준을 지키기 위해 포기할 수 있는 성과는 무엇입니까?',hint:'출석·침례·재정·평판처럼 측정 가능한 성과와 충돌하는 상황을 상상해 보세요.'},
+    {kind:'자기 이해',q:'성도들이 10년 뒤 당신을 한 문장으로 기억한다면 어떤 문장이기를 바라며, 이를 위해 지금 무엇을 하고 있습니까?',hint:'이상적인 모습뿐 아니라, 현재 실제로 보이는 행동과 그 사이의 차이도 적어 보세요.'}
+  ]},
+  {title:'신학과 성경 해석',subtitle:'나는 어떤 근거로 믿고 판단하는가',questions:[
+    {kind:'해석 과정',q:'낯설거나 논쟁적인 성경 본문을 만났을 때 어떤 순서로 해석하고 결론을 내립니까?',hint:'문맥, 원어, 역사, 신학 전통, 엘렌 화잇 등의 자료를 어떻게 활용하고 검증하는지 실제 사례로 설명해 주세요.'},
+    {kind:'확신과 수정',q:'오랫동안 확신하던 신학적 해석을 다시 생각하게 된 경험이 있습니까? 무엇이 생각을 바꾸게 했습니까?',hint:'바뀐 경험이 없다면 어떤 종류의 근거가 충분할 때 기존 해석을 재검토하겠습니까?'},
+    {kind:'가치 충돌',q:'교리의 정확한 전달과 한 사람의 현실적 고통을 돌보는 일이 충돌하는 듯 보일 때 어떻게 접근하겠습니까?',hint:'둘 중 하나를 쉽게 포기하지 않기 위해 사용하는 질문이나 언어를 적어 주세요.'}
+  ]},
+  {title:'설교와 언어',subtitle:'나는 말씀을 어떤 이야기로 전달하는가',questions:[
+    {kind:'제작 과정',q:'성경 본문을 하나의 설교로 발전시키는 당신만의 과정을 처음부터 끝까지 설명해 주세요.',hint:'본문 선택, 연구, 중심 질문, 구조, 예화, 적용, 퇴고, 발표 등 실제 작업 순서를 적어 주세요.'},
+    {kind:'문체의 지문',q:'자신이 쓴 설교에서 ‘이 문장이 가장 나답다’ 싶은 부분을 적고, 왜 그렇게 생각하는지 설명해 주세요.',hint:'가능하면 3~8문장을 직접 붙여 넣으세요. 반대로 피하고 싶은 표현도 적어 주세요.'},
+    {kind:'설교 딜레마',q:'설교의 흥미를 높일 수 있지만 본문 메시지를 단순화할 위험이 있는 예화를 발견했다면 어떻게 결정하겠습니까?',hint:'청중의 관심, 본문의 충실성, 감정적 설득 사이에서 무엇을 확인하는지 적어 주세요.'}
+  ]},
+  {title:'인간 이해와 목양',subtitle:'나는 사람의 고통과 변화를 어떻게 대하는가',questions:[
+    {kind:'위로와 권면',q:'성도가 자신의 잘못을 인정하지 않은 채 위로를 요청한다면 어떤 순서와 표현으로 대화하겠습니까?',hint:'그 사람이 먼저 들어야 하는 말과, 아직 해서는 안 되는 말은 무엇입니까? 신상을 드러내지 않는 사례를 사용할 수 있습니다.'},
+    {kind:'차이의 존중',q:'나와 신앙관이나 생활방식이 크게 다른 성도와 관계를 맺을 때 지키는 원칙은 무엇입니까?',hint:'존중과 권면의 경계, 공동체의 기준과 개인의 자유를 판단하는 방식을 적어 주세요.'},
+    {kind:'관계의 상처',q:'목회 중 오해나 비판으로 자신이 상처받았을 때 실제로 어떻게 반응하며, 이후 관계를 어떻게 회복하려 합니까?',hint:'감정과 실제 행동을 구분해 적어 주세요. 이상적인 모습과 달랐던 경험도 중요합니다.'}
+  ]},
+  {title:'리더십과 의사결정',subtitle:'나는 불확실성과 갈등 속에서 어떻게 결정하는가',questions:[
+    {kind:'갈등 판단',q:'다수는 빠른 결정을 원하지만 소수는 양심의 문제로 반대한다면 어떻게 회의를 이끌겠습니까?',hint:'어떤 정보를 확인하고, 누구의 말을 더 들으며, 결정을 보류하거나 강행하는 기준은 무엇입니까?'},
+    {kind:'성과와 참여',q:'효율적인 방식과 구성원의 참여를 보장하는 방식이 충돌한다면 무엇을 기준으로 선택합니까?',hint:'실제 회의, 부서 운영, 직원 선출 등 익숙한 상황을 떠올려 보세요.'},
+    {kind:'위임과 통제',q:'동역자에게 일을 맡길 때 어느 정도까지 자율성을 주며, 언제 직접 개입합니까?',hint:'위임에 실패했던 경험이나 자신의 통제 욕구를 발견했던 순간이 있다면 적어 주세요.'}
+  ]},
+  {title:'교육과 공동체 성장',subtitle:'나는 사람을 어떻게 배우고 성장하게 하는가',questions:[
+    {kind:'교육 철학',q:'성경공부나 소그룹 모임에서 참여자가 무엇을 경험하고 돌아가기를 바라십니까?',hint:'지식 습득, 신앙적 결단, 대화, 관계, 실천 중 무엇에 무게를 두는지 구체적으로 설명해 주세요.'},
+    {kind:'깊이와 재미',q:'청년들이 즐거워하지만 배움이 얕은 프로그램과, 깊지만 참여가 저조한 프로그램 사이에서 어떻게 균형을 잡겠습니까?',hint:'내용을 희생하지 않으면서 몰입을 높이는 당신만의 방법을 적어 보세요.'},
+    {kind:'성장의 순간',q:'누군가의 신앙이나 태도가 변했다고 느낀 기억에 남는 순간을 소개하고, 무엇이 변화를 만들었다고 생각하는지 적어 주세요.',hint:'실명이나 식별 가능한 세부사항은 제외해 주세요.'}
+  ]},
+  {title:'창의성·사회와의 접점',subtitle:'나는 새로운 시대의 질문에 어떻게 응답하는가',questions:[
+    {kind:'시대 읽기',q:'사회적 사건이나 기술 변화에서 설교 주제를 발견할 때 어떤 기준으로 기독교 신앙과 연결합니까?',hint:'시의성만을 좇지 않기 위해 점검하는 질문과 실제 사례를 적어 주세요.'},
+    {kind:'실험과 실패',q:'새로운 사역이나 콘텐츠를 시도했다가 기대한 결과를 얻지 못했던 경험이 있다면 무엇을 배웠습니까?',hint:'실패를 해석하는 방식과 다음 시도에 무엇을 반영했는지 중요합니다.'},
+    {kind:'바꿀 것과 지킬 것',q:'목회의 방식 중 과감하게 바꾸고 싶은 것과, 시대가 변해도 지켜야 할 것은 각각 무엇입니까?',hint:'예배, 선교, 교육, 소통, 매체 등 실제 사역의 예로 설명해 주세요.'}
+  ]},
+  {title:'업무 방식과 AI 협력',subtitle:'내 생각을 어떻게 기록하고 확장할 것인가',questions:[
+    {kind:'생각의 작업대',q:'중요한 일을 준비할 때 어떤 자료와 도구를 쓰고, 생각을 어떤 순서로 정리합니까?',hint:'기록 습관, 자료 분류법, 집중되는 환경, 가장 자주 막히는 지점을 적어 주세요.'},
+    {kind:'AI의 경계',q:'AI가 당신을 도울 때 적극적으로 맡기고 싶은 일과, 결코 대신 판단해서는 안 되는 일은 무엇입니까?',hint:'출처 검증, 신학적 오류, 상담 비밀, 개인의 양심, 설교의 진정성에 대한 기준을 포함해 주세요.'},
+    {kind:'제2의 두뇌 지침',q:'당신의 생각을 배우는 AI에게 반드시 기억시키고 싶은 원칙 다섯 가지는 무엇입니까?',hint:'좋아하는 답변 방식, 반론을 듣는 방식, 인용 원칙, 문체, 오류를 지적하는 방식까지 자유롭게 적어 주세요.'}
+  ]}
+];
+const KEY = 'pastoral_mind_interview_v1';
+const blank = () => ({answers:{},displayName:'',ministry:'',career:'',consent:false,docId:'',driveDocUrl:'',completedAt:'',driveSavedAt:'',sessionId:'pm-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,9)});
+let state;
+try { state = {...blank(), ...(JSON.parse(localStorage.getItem(KEY)||'{}')||{})}; } catch(e) { state=blank(); }
+if (!state.answers || typeof state.answers!=='object') state.answers={};
+let current=0, isSaving=false;
+const $=id=>document.getElementById(id);
+const indexOfQuestion=(section,j)=> `${section+1}-${j+1}`;
+const questionCount=()=>SECTIONS.reduce((sum,sec,i)=>sum+sec.questions.filter((_,j)=>String(state.answers[indexOfQuestion(i,j)]||'').trim().length>0).length,0);
+function persist() { try { localStorage.setItem(KEY,JSON.stringify(state)); } catch(e) {} updateProgress(); }
+function updateProgress() {
+  const done=questionCount();
+  $('progressText').textContent=`${done} / 24 답변`;
+  $('progressFill').style.width=`${done/24*100}%`;
+  const finished=done===24 && !!state.completedAt;
+  $('completeBtn').disabled=done!==24 || finished;
+  $('completeBtn').textContent=finished?'✓ 작성 완료됨':'✓ 작성 완료';
+  $('completeStatus').className='complete-status'+(finished?' done':'');
+  $('completeStatus').textContent=finished?(state.driveSavedAt?'제출 완료 · Google Drive 저장 확인':'작성 완료 · 이 기기에 완료 기록됨'):(done===24?'모든 문항 작성 완료! 버튼을 눌러 마무리해 주세요.':`${24-done}개 질문이 남았습니다.`);
+  if(current===SECTIONS.length-1){$('nextBtn').textContent=finished?'작성 완료됨 ✓':(done===24?'✓ 작성 완료':`아직 ${24-done}개 질문이 남았습니다`);$('nextBtn').disabled=done!==24 || finished;}
+  document.querySelectorAll('.nav-item').forEach((node,section)=>{
+    node.querySelector('.nav-dot')?.remove();
+    if (SECTIONS[section].questions.every((_,j)=>String(state.answers[indexOfQuestion(section,j)]||'').trim())) {
+      const dot=document.createElement('span'); dot.className='nav-dot'; node.appendChild(dot);
+    }
+  });
+  $('finishGrid').innerHTML='';
+  SECTIONS.forEach((sec,i)=>{
+    const d=sec.questions.filter((_,j)=>String(state.answers[indexOfQuestion(i,j)]||'').trim()).length;
+    const item=document.createElement('div'); item.className=`finish-chip ${d===3?'done':''}`;
+    item.textContent=`${i+1}. ${sec.title} · ${d}/3`;
+    $('finishGrid').appendChild(item);
+  });
+}
+function renderNav() {
+  $('sideNav').innerHTML='';
+  SECTIONS.forEach((s,i)=>{
+    const btn=document.createElement('button'); btn.type='button'; btn.className='nav-item'+(current===i?' active':'');
+    btn.innerHTML=`<span class="nav-num">${String(i+1).padStart(2,'0')}</span><span class="nav-name">${s.title}</span>`;
+    btn.addEventListener('click',()=>jump(i)); $('sideNav').appendChild(btn);
+  });
+}
+function renderSection() {
+  const s=SECTIONS[current];
+  $('identityBlock').style.display=current===0?'block':'none';
+  $('sectionTitle').innerHTML=`<div class="eyebrow">CHAPTER ${String(current+1).padStart(2,'0')} / 08</div><h2>${s.title}</h2><p>${s.subtitle}</p>`;
+  $('questionList').innerHTML='';
+  s.questions.forEach((q,j)=>{
+    const id=indexOfQuestion(current,j);
+    const card=document.createElement('article'); card.className='question-card';
+    card.innerHTML=`<div class="question-top"><span class="number">QUESTION ${String(current*3+j+1).padStart(2,'0')} / 24</span><span class="question-kind">${q.kind}</span></div><h3>${q.q}</h3><p class="helper">${q.hint}</p><textarea id="q-${id}" maxlength="12000" aria-label="${q.q}" placeholder="실제 경험, 그때의 생각, 판단의 이유를 자유롭게 기록해 주세요."></textarea><div class="question-foot"><span>구체적인 사례가 더 도움이 됩니다 · 응답은 언제든 수정 가능</span><span id="count-${id}"></span></div>`;
+    const area=card.querySelector('textarea'); area.value=state.answers[id]||'';
+    area.addEventListener('input',()=>{state.answers[id]=area.value; state.completedAt=''; state.driveSavedAt=''; $(`count-${id}`).textContent=`${area.value.length.toLocaleString()}자`; persist();});
+    card.querySelector(`#count-${id}`).textContent=`${area.value.length.toLocaleString()}자`;
+    $('questionList').appendChild(card);
+  });
+  $('prevBtn').disabled=current===0;
+  $('nextBtn').textContent=current===SECTIONS.length-1?'마지막 영역입니다 ✓':'다음 영역 →';
+  $('nextBtn').disabled=false;
+  renderNav(); updateProgress();
+}
+function jump(i) { current=i; renderSection(); window.scrollTo({top:0,behavior:'smooth'}); }
+function payload() {
+  return { displayName:state.displayName, ministry:state.ministry, career:state.career,
+    sessionId:state.sessionId, docId:state.docId, completedAt:state.completedAt, consent:$('consent').checked,
+    answers:SECTIONS.flatMap((s,i)=>s.questions.map((q,j)=>({id:indexOfQuestion(i,j),section:`${i+1}. ${s.title}`,question:q.q,answer:state.answers[indexOfQuestion(i,j)]||''}))) };
+}
+function markdown() {
+  const p=payload(); let out=`# Pastoral Mind · 목회자 심층 인터뷰\n\n- 이름 또는 별명: ${p.displayName||'익명'}\n- 주요 사역: ${p.ministry||'미입력'}\n- 경력: ${p.career||'미입력'}\n- 기록 일시: ${new Date().toLocaleString('ko-KR')}\n- 작성 완료: ${state.completedAt?new Date(state.completedAt).toLocaleString('ko-KR'):'진행 중'}\n\n`;
+  SECTIONS.forEach((s,i)=>{out+=`## ${i+1}. ${s.title}\n\n`; s.questions.forEach((q,j)=>{const id=indexOfQuestion(i,j);out+=`### Q${id}. ${q.q}\n\n${state.answers[id]?.trim()||'(미응답)'}\n\n`;});});
+  return out+'---\n이 기록은 인터뷰 원문이며, AI의 진단이나 분석이 아닙니다.\n';
+}
+function downloadBackup() {
+  const blob=new Blob([markdown()],{type:'text/markdown;charset=utf-8'});
+  const url=URL.createObjectURL(blob); const a=document.createElement('a');
+  a.href=url; a.download=`PastoralMind_${(state.displayName||'interview').replace(/[^\w\uAC00-\uD7A3-]/g,'_').slice(0,25)}_${new Date().toISOString().slice(0,10)}.md`;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),2000);
+  message('이 기기에 Markdown 백업 파일을 저장했습니다.');
+}
+function message(m,error=false,link='') {
+  const el=$('saveMessage'); el.className='message'+(error?' error':''); el.textContent=m;
+  if (link) { const a=document.createElement('a');a.href=link;a.target='_blank';a.rel='noopener noreferrer';a.textContent=' 저장한 구글 문서 열기 ↗'; el.appendChild(document.createTextNode(' '));el.appendChild(a); }
+}
+function isGasMode(){return !!(typeof google!=='undefined' && google.script && google.script.run);}
+function isOAuthMode(){return !!(window.PASTORAL_MIND_GOOGLE_CLIENT_ID && window.PastoralDrive);}
+function finishInterview(){
+  const remaining=24-questionCount();
+  if(remaining>0){message(`${remaining}개 질문에 아직 답하지 않았습니다. 전부 작성한 뒤 완료해 주세요.`,true);return;}
+  state.completedAt=new Date().toISOString(); state.driveSavedAt=''; persist();
+  $('finishCard').scrollIntoView({behavior:'smooth',block:'center'});
+  if($('consent').checked && (isGasMode() || isOAuthMode())) {
+    message('모든 답변을 작성했습니다. Google Drive에 최종 응답을 저장합니다.');
+    saveDrive();
+  } else {
+    downloadBackup();
+    message('24개 문항을 작성 완료했습니다. 응답을 PC에 백업했습니다. Google Drive에 저장하려면 계정을 연결하고 동의 항목을 체크해 주세요.');
+  }
+}
+function saveDrive(){
+  if(isSaving)return;
+  state.consent=$('consent').checked;persist();
+  if(!state.consent){message('드라이브 저장 동의에 체크해 주세요.',true);return;}
+  if(questionCount()===0){message('최소 한 문항에 답변한 뒤 저장해 주세요.',true);return;}
+  if(!isGasMode() && !isOAuthMode()){
+    message('Google Drive 저장 연결이 아직 설정되지 않았습니다. 지금은 「내 PC에 백업」을 사용하세요. GitHub Pages에서는 별도 Google OAuth 설정이 필요합니다.',true);return;
+  }
+  isSaving=true; $('driveSave').disabled=true;$('driveSave').textContent='저장 중…';
+  message('Google Drive에 응답을 저장하고 있습니다.');
+  const onSuccess=r=>{
+    isSaving=false;$('driveSave').disabled=false;$('driveSave').textContent='☁ 구글 드라이브에 저장';
+    if(!r||!r.ok){message('저장 결과를 확인하지 못했습니다. PC 백업을 이용해 주세요.',true);return;}
+    if(r.docId)state.docId=r.docId;
+    if(r.url)state.driveDocUrl=r.url;
+    if(state.completedAt)state.driveSavedAt=new Date().toISOString();
+    persist();message(`${r.updated?'기존 문서가 업데이트':'구글 문서가 생성'}되었습니다. (${r.savedAt||'저장 완료'})`,false,r.url||'');
+  };
+  const onFailure=err=>{
+    isSaving=false;$('driveSave').disabled=false;$('driveSave').textContent='☁ 구글 드라이브에 저장';
+    message('저장 실패: '+(err&&err.message?err.message:'원인을 확인할 수 없습니다')+' · 먼저 PC 백업을 해주세요.',true);
+  };
+  if(isGasMode()){
+    google.script.run.withSuccessHandler(onSuccess).withFailureHandler(onFailure).saveResponses(payload());
+  }else{
+    window.PastoralDrive.save(payload(),markdown()).then(onSuccess).catch(onFailure);
+  }
+}
+$('prevBtn').addEventListener('click',()=>jump(Math.max(0,current-1)));
+$('nextBtn').addEventListener('click',()=>current===7?finishInterview():jump(Math.min(7,current+1)));
+['displayName','ministry','career'].forEach(id=>{ $(id).value=state[id]||''; $(id).addEventListener('input',()=>{state[id]=$(id).value;state.completedAt='';state.driveSavedAt='';persist();}); });
+$('consent').checked=!!state.consent;
+$('consent').addEventListener('change',()=>{state.consent=$('consent').checked;persist();});
+$('driveSave').addEventListener('click',saveDrive);
+$('completeBtn').addEventListener('click',finishInterview);
+$('downloadBtn').addEventListener('click',downloadBackup);
+$('clearBtn').addEventListener('click',()=>{
+  if (!confirm('이 브라우저에 보관된 인터뷰 초안을 삭제하시겠습니까? 구글 드라이브에 저장한 문서는 삭제되지 않습니다.')) return;
+  localStorage.removeItem(KEY);state=blank();['displayName','ministry','career'].forEach(id=>{$(id).value=''});$('consent').checked=false;current=0;renderSection();message('이 기기의 초안을 삭제했습니다. 드라이브 문서는 그대로 유지됩니다.');
+});
+renderSection();
+if(!isGasMode()) {
+  message(isOAuthMode()?'Google Drive 저장을 사용하려면 계정 인증이 필요합니다. 첫 저장 시 Google 로그인 창이 열립니다.':'현재는 웹페이지 미리보기입니다. 작성과 PC 백업은 가능하며, 드라이브 저장은 인증 설정 후 사용할 수 있습니다.');
+}
+</script>
+</body>
+</html>
